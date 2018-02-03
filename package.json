@@ -1,6 +1,6 @@
 {
   "name": "baguette",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "an extremely light-weighted scripting language designed for javascript",
   "main": "src/vm/baguette-vm.js",
   "scripts": {
@@ -34,10 +34,10 @@
   },
   "repository": {
     "type": "git",
-    "url": "git+https://github.com/zzk1st/pickle.git"
+    "url": "git+https://github.com/zzk1st/baguette.git"
   },
   "bugs": {
-    "url": "https://github.com/zzk1st/pickle/issues"
+    "url": "https://github.com/zzk1st/baguette/issues"
   },
-  "homepage": "https://github.com/zzk1st/pickle#readme"
+  "homepage": "https://github.com/zzk1st/baguette#readme"
 }
