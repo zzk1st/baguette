@@ -1,0 +1,13 @@
+void main()
+{
+  showText("帝都浮生记  第一章");
+  a = select("准备好了吗？", "让我再想想...", "快开始吧！");
+  if (a == 0)
+  {
+    showText("怂包！");
+  }
+  else
+  {
+    showText("你是坠吼滴！");
+  }
+}

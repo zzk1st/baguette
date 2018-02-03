@@ -1,0 +1,20 @@
+int main()
+{
+  c=1;
+  if (a==1)
+  {
+    print("if block");
+    if (b == 2)
+    {
+      print("if if block");
+    }
+    c = 2;
+  }
+  else
+  {
+    print("else block");
+    c = 1;
+  }
+
+  return b;
+}

@@ -1,0 +1,43 @@
+{
+  "name": "baguette",
+  "version": "0.1.0",
+  "description": "an extremely light-weighted scripting language designed for javascript",
+  "main": "src/vm/baguette-vm.js",
+  "scripts": {
+    "baguette-compiler": "src/compiler/baguette-compiler.js",
+    "baguette-vm": "src/vm/baguette-vm.js",
+    "test": "ava"
+  },
+  "author": "Zhongkai ZHU",
+  "license": "ISC",
+  "bin": {
+    "bcc": "src/compiler/bcc.js"
+  },
+  "devDependencies": {
+    "ava": "^0.25.0",
+    "fs": "0.0.1-security",
+    "minimist": "^1.2.0",
+    "nearley": "^2.11.0"
+  },
+  "ava": {
+    "files": [
+      "tests/*.js",
+      "!**/not-this-file.js"
+    ],
+    "source": [
+      "src/*.js"
+    ]
+  },
+  "directories": {
+    "example": "examples",
+    "test": "tests"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/zzk1st/pickle.git"
+  },
+  "bugs": {
+    "url": "https://github.com/zzk1st/pickle/issues"
+  },
+  "homepage": "https://github.com/zzk1st/pickle#readme"
+}
