@@ -14,8 +14,14 @@
     {
       "type": "node",
       "request": "launch",
-      "name": "test-run",
-      "program": "${workspaceFolder}/src/vm/test-run.js"
+      "name": "test-file",
+      "program": "${workspaceFolder}/examples/vm-hello-world-file.js"
+    },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "test-in-memory",
+      "program": "${workspaceFolder}/examples/vm-hello-world-in-memory.js"
     },
   ]
 }

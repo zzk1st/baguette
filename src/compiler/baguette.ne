@@ -38,7 +38,7 @@ _stringchar ->
         [^\"] {% function(d) {return d[0] } %}
 
 word -> [A-Za-z] {% id %}
-        | word [A-Za-z0-9] {% function(d) { return "" + d[0] + d[1] } %}
+        | word [A-Za-z0-9\.] {% function(d) { return "" + d[0] + d[1] } %}
 
 FunctionCall -> word "(" _ paramvals _ ")"
                 {% function(d) { return ["call", d[0], d[3]] } %}

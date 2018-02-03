@@ -12,12 +12,24 @@ let envFuncs = {
 // OPERATORS & ASSIGNMENT TEST
 //-------------------------------------------
 ava.test('operator & assignment test', t => {
-  let envVars = {a: 1};
+  let envVars = {
+    a: {
+      a1: {
+        a11: 1
+      },
+      a2: "str"
+    },
+    b: -1,
+    c: ""
+  };
   let baguetteCompiler = new BaguetteCompiler(`
     int main()
     {
-      a = (1 + 2) * 4 / 3 - 5;
-      return a;
+      a.a1.a11 = b;
+      b = (1 + 2) * 4 / 3 - 5;
+      c = a.a2;
+
+      return b;
     }
   `);
   let interCode = baguetteCompiler.generateIntermediateCode();
@@ -26,7 +38,9 @@ ava.test('operator & assignment test', t => {
   let result = baguetteVM.runFunc('main');
 
   t.deepEqual(result, -1);
-  t.deepEqual(envVars.a, -1);
+  t.deepEqual(envVars.a.a1.a11, -1);
+  t.deepEqual(envVars.b, -1);
+  t.deepEqual(envVars.c, "str");
 });
 
 //-------------------------------------------

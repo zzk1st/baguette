@@ -129,10 +129,20 @@ class BaguetteVM {
     } else if (instruction[0] == 'pushnum') {
       this._stack.push(parseFloat(instruction[1]));
     } else if (instruction[0] == 'pushvar') {
-      if (!(instruction[1] in this.envVars)) {
-        throw new Error(`${instruction[1]} is not in environment variables!`);
+      let fields = instruction[1].split('.');
+      if (!(fields[0] in this.envVars)) {
+        throw new Error(`${fields[0]} is not in environment variables!`);
       }
-      this._stack.push(this.envVars[instruction[1]]);
+      let result = this.envVars[fields[0]];
+      if (fields.length > 1) {
+        for (let i = 1; i < fields.length; ++i) {
+          if (!(fields[i] in result)) {
+            throw new Error(`${fields[i]} is not in environment variables!`);
+          }
+          result = result[fields[i]];
+        }
+      }
+      this._stack.push(result);
     } else if (instruction[0] == 'pushstr') {
       this._stack.push(instruction[1]);
     //--------------------------------------
@@ -222,10 +232,26 @@ class BaguetteVM {
     // assign instructions
     //--------------------------------------
     } else if (instruction[0] == 'assign') {
-      if (!(instruction[1] in this.envVars)) {
-        throw new Error(`${instruction[1]} is not in environment variables!`);
+      let fields = instruction[1].split('.');
+      if (fields.length == 1) {
+        if (!(instruction[1] in this.envVars)) {
+          throw new Error(`${instruction[1]} is not in environment variables!`);
+        }
+        this.envVars[instruction[1]] = this._stack.pop();
+      } else {
+        var envVarToAssign = this.envVars[fields[0]];
+        for (let i = 1; i < fields.length - 1; ++i) {
+          if (!(fields[i] in envVarToAssign)) {
+            throw new Error(`${fields[i]} is not in environment variables!`);
+          }
+          envVarToAssign = envVarToAssign[fields[i]];
+        }
+        let finalField = fields[fields.length - 1];
+        if (!(finalField in envVarToAssign)) {
+          throw new Error(`${finalField} is not in environment variables!`);
+        }
+        envVarToAssign[finalField] = this._stack.pop();
       }
-      this.envVars[instruction[1]] = this._stack.pop();
     } else {
       throw new Error(`Unknown instruction: ${instruction}`);
     }

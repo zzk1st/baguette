@@ -37,7 +37,7 @@ function id(x) {return x[0]; }
     {"name": "_string", "symbols": ["_string", "_stringchar"], "postprocess": function(d) {return d[0] + d[1] }},
     {"name": "_stringchar", "symbols": [/[^\"]/], "postprocess": function(d) {return d[0] }},
     {"name": "word", "symbols": [/[A-Za-z]/], "postprocess": id},
-    {"name": "word", "symbols": ["word", /[A-Za-z0-9]/], "postprocess": function(d) { return "" + d[0] + d[1] }},
+    {"name": "word", "symbols": ["word", /[A-Za-z0-9\.]/], "postprocess": function(d) { return "" + d[0] + d[1] }},
     {"name": "FunctionCall", "symbols": ["word", {"literal":"("}, "_", "paramvals", "_", {"literal":")"}], "postprocess": function(d) { return ["call", d[0], d[3]] }},
     {"name": "P", "symbols": [{"literal":"("}, "_", "AS", "_", {"literal":")"}], "postprocess": function(d) { return d[2] }},
     {"name": "P", "symbols": ["N"], "postprocess": id},
