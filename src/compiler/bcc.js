@@ -1,6 +1,6 @@
 #!/usr/bin/env node
 const fs = require('fs');
-const BaguetteCompiler = require('./baguette-compiler');
+const BaguetteCompiler = require('./baguette-compiler').BaguetteCompiler;
 
 const args = require('minimist')(process.argv.slice(2));
 
