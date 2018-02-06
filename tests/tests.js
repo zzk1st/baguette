@@ -23,7 +23,7 @@ ava.test('operator & assignment test', t => {
     c: ""
   };
   let baguetteCompiler = new BaguetteCompiler(`
-    int main()
+    function main()
     {
       a.a1.a11 = b;
       b = (1 + 2) * 4 / 3 - 5;
@@ -52,7 +52,7 @@ ava.test('ifelse test', t => {
     b: 2,
   };
   let baguetteCompiler = new BaguetteCompiler(`
-    int main()
+    function main()
     {
       a = 1;
       if (a == 1) {
@@ -82,7 +82,7 @@ ava.test('ifelse test', t => {
 
   envFuncs.print.pauseAfterComplete = true;
   let baguetteCompiler = new BaguetteCompiler(`
-    int main()
+    function main()
     {
       a = 1;
       b = print("pause function!");

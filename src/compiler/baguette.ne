@@ -111,10 +111,10 @@ WhileLoop -> "while" _ "(" _ condition _ ")" _ "{" block _ "}"
 ForLoop -> "for" _ "(" _ assignment ";" _ condition ";" _ assignment _ ")" _ "{" block _ "}"
             {% function(d) { return ["for", d[4], d[7], d[10], d[15]] } %}
 
-function -> type " " word _ "(" _ params _ ")" _ "{" block _ "}"
-            {% function(d) { return ["func", d[0], d[2], d[6], d[11]] }%}
-          | type " " word _ "(" _ params _ ")" _ "{" _ "}"
-            {% function(d) { return ["func", d[0], d[2], d[6], []] } %}
+function -> "function " word _ "(" _ params _ ")" _ "{" block _ "}"
+            {% function(d) { return ["func", d[1], d[5], d[10]] }%}
+          | "function " word _ "(" _ params _ ")" _ "{" _ "}"
+            {% function(d) { return ["func", d[1], d[5], []] } %}
 
 param -> type " " word {% function(d) { return [d[0], d[2]] } %}
 paramval -> value {% id %}

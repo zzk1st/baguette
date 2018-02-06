@@ -19,7 +19,7 @@ let envVars = {
   c: ""
 };
 let src = `
-  int main()
+  function main()
   {
     a.a1.a11 = b;
     b = (1 + 2) * 4 / 3 - 5;

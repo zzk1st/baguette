@@ -55,9 +55,8 @@ class BaguetteCompiler {
         throw new Error("not a function");
       }
 
-      this.addInstruction(['function', funcDecl[2]]);
-      // 明天继续搞generateBlock
-      this.generateBlock(funcDecl[4]);
+      this.addInstruction(['function', funcDecl[1]]);
+      this.generateBlock(funcDecl[3]);
       this.addInstruction(['function_end']);
     }
 
