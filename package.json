@@ -39,5 +39,6 @@
   "bugs": {
     "url": "https://github.com/zzk1st/baguette/issues"
   },
-  "homepage": "https://github.com/zzk1st/baguette#readme"
+  "homepage": "https://github.com/zzk1st/baguette#readme",
+  "dependencies": {}
 }

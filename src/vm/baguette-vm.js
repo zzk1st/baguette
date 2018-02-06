@@ -73,7 +73,6 @@ class BaguetteVM {
     }
 
     if (this._state == State.Complete) {
-      this._state = State.NotStarted;
       return this._returnValue;
     } else {
       // paused
