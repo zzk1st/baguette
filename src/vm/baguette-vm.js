@@ -125,6 +125,8 @@ class BaguetteVM {
     //--------------------------------------
     // push-to-stack instructions
     //--------------------------------------
+    } else if (instruction[0] == 'pushbool') {
+      this._stack.push(instruction[1] == 'true');
     } else if (instruction[0] == 'pushnum') {
       this._stack.push(parseFloat(instruction[1]));
     } else if (instruction[0] == 'pushvar') {
@@ -147,6 +149,17 @@ class BaguetteVM {
     //--------------------------------------
     // operator instructions
     //--------------------------------------
+    } else if (instruction[0] == 'logic_not') {
+      let v1 = this._stack.pop();
+      this._stack.push(!v1);
+    } else if (instruction[0] == 'logic_and') {
+      let v2 = this._stack.pop();
+      let v1 = this._stack.pop();
+      this._stack.push(v1 && v2);
+    } else if (instruction[0] == 'logic_or') {
+      let v2 = this._stack.pop();
+      let v1 = this._stack.pop();
+      this._stack.push(v1 || v2);
     } else if (instruction[0] == 'more') {
       let v2 = this._stack.pop();
       let v1 = this._stack.pop();

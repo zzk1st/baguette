@@ -18,17 +18,28 @@ let envVars = {
   b: -1,
   c: ""
 };
+//let src = `
+//  function main()
+//  {
+//    a.a1.a11 = b;
+//    b = (1 + 2) * 4 / 3 - 5;
+//    c = a.a2;
+//
+//    return a;
+//  }
+//`;
 let src = `
   function main()
   {
-    a.a1.a11 = b;
-    b = (1 + 2) * 4 / 3 - 5;
-    c = a.a2;
-
-    return a;
+    if (!b == 0 && a.a1.a11 == 1) 
+    {
+      return true;
+    }
+    return false;
   }
 `;
 let baguetteCompiler = new BaguetteCompiler(src);
 let interCode = baguetteCompiler.generateIntermediateCode();
 let baguetteVM = new BaguetteVM(interCode, envVars, envFuncs);
 let result = baguetteVM.runFunc('main');
+console.log(result);

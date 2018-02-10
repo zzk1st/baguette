@@ -31,6 +31,10 @@ class BaguetteCompiler {
     this.intermediateCode += instruction;
   }
 
+  isBool(n) {
+    return n == "true" || n == "false";
+  }
+
   isNumeric(n) {
     return !isNaN(parseFloat(n)) && isFinite(n);
   }
@@ -140,7 +144,28 @@ class BaguetteCompiler {
   }
 
   generateExp(exp) {
-    if (exp[0] == '>') {
+    if (exp[0] == 'call') {
+      this.generateFunctionCall(exp);
+    } else if (this.isBool(exp)) {
+      this.addInstruction(['pushbool', exp]);
+    } else if (this.isNumeric(exp)) {
+      this.addInstruction(['pushnum', exp]);
+    } else if (this.isString(exp)) {
+      this.addInstruction(['pushstr', exp.replace(/"/g, '')]);
+    } else if (this.isSymbol(exp)) {
+      this.addInstruction(['pushvar', exp]);
+    } else if (exp[0] == '!') {
+      this.generateExp(exp[1]);
+      this.addInstruction(['logic_not']);
+    } else if (exp[0] == '&&') {
+      this.generateExp(exp[1]);
+      this.generateExp(exp[2]);
+      this.addInstruction(['logic_and']);
+    } else if (exp[0] == '||') {
+      this.generateExp(exp[1]);
+      this.generateExp(exp[2]);
+      this.addInstruction(['logic_or']);
+    } else if (exp[0] == '>') {
       this.generateExp(exp[1]);
       this.generateExp(exp[2]);
       this.addInstruction(['more']);
@@ -176,14 +201,6 @@ class BaguetteCompiler {
       this.generateExp(exp[1]);
       this.generateExp(exp[2]);
       this.addInstruction(['divide']);
-    } else if (exp[0] == 'call') {
-      this.generateFunctionCall(exp);
-    } else if (this.isNumeric(exp)) {
-      this.addInstruction(['pushnum', exp]);
-    } else if (this.isString(exp)) {
-      this.addInstruction(['pushstr', exp.replace(/"/g, '')]);
-    } else if (this.isSymbol(exp)) {
-      this.addInstruction(['pushvar', exp]);
     }
   }
 }

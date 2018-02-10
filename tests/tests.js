@@ -72,6 +72,42 @@ ava.test('ifelse test', t => {
 });
 
 //-------------------------------------------
+// EXPRESSION TEST
+//-------------------------------------------
+ava.test('expression test', t => {
+  let envVars = {
+    a: 0,
+    b: 1,
+  };
+  let baguetteCompiler = new BaguetteCompiler(`
+    function main()
+    {
+      if (!a)
+      {
+        if (a==0 && b==1)
+        {
+          if (a==1 || b == 1)
+          {
+            if (!a==1 && b == 0+1)
+            {
+              a = b== 1;
+            }
+          }
+        }
+      }
+
+      return a;
+    }
+  `);
+  let interCode = baguetteCompiler.generateIntermediateCode();
+
+  let baguetteVM = new BaguetteVM(interCode, envVars, envFuncs);
+  let result = baguetteVM.runFunc('main');
+
+  t.deepEqual(result, true);
+});
+
+//-------------------------------------------
 // PAUSE & CONTINUE TEST
 //-------------------------------------------
 ava.test('ifelse test', t => {

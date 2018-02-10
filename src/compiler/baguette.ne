@@ -65,14 +65,10 @@ N -> number {% id %}
     | variable {% id %}
     | string {% id %}
 
-variable -> word {% id %} |
-        "*" AS {% function(d) { return ["derefexp", d[0], d[1]] } %}
-        | word "->" word {% function(d) { return d.join("") } %}
-
-value -> AS {% id %}
+variable -> word {% id %}
 
 declUndef -> type " " word {% function(d) { return ["decl", d[0], d[2], null] } %}
-declInit -> declUndef _ "=" _ value {% function(d) { return [d[0][0], d[0][1], d[0][2], d[4]] } %}
+declInit -> declUndef _ "=" _ exp {% function(d) { return [d[0][0], d[0][1], d[0][2], d[4]] } %}
 declaration -> declInit {% id %}
               | declUndef {% id %}
 
@@ -82,7 +78,7 @@ structBit -> _ declUndef ";" {% function(d) { return [d[1][1], d[1][2]] } %}
 structBits -> structBit |
               structBits structBit {% function(d) { return d[0].concat([d[1]]) } %}
 
-assignment -> variable _ assignmentOperator _ value {% function(d) { return ["assignment", d[0], d[2], d[4]] } %}
+assignment -> variable _ assignmentOperator _ exp {% function(d) { return ["assignment", d[0], d[2], d[4]] } %}
 assignmentOperator -> "=" {% id %}
                     | "+=" {% id %}
                     | "-=" {% id %}
@@ -92,16 +88,25 @@ assignmentOperator -> "=" {% id %}
 IfStatement -> bareifStatement | elseIfStatement {% id %}
 ElseBlock -> IfStatement {% id %}
           | "{" block _ "}" {% function(d) { return d[1] } %}
-bareifStatement -> "if" _ "(" _ condition _ ")" _ "{" block _ "}"
+bareifStatement -> "if" _ "(" _ exp _ ")" _ "{" block _ "}"
                 {% function(d) { return ["if", d[4], d[9]] } %}
 elseIfStatement -> bareifStatement _ "else" _ ElseBlock
                   {% function(d) { return ["ifElse", d[0], d[4]] } %}
 
-condition -> value _ conditional _ value {% function(d) { return [d[2], d[0], d[4]]} %}
+exp -> logic {%id %}
+logic -> uniaryLogic _ logicBinaryOp _ uniaryLogic {% function(d) { return [d[2], d[0], d[4]]} %}
+        | uniaryLogic {% id %}
+uniaryLogic -> logicUniaryOp _ condition {% function(d) { return [d[0], d[2]]} %}
+            | condition {% id %}
+logicBinaryOp -> "&&" | "||" {% id %}
+logicUniaryOp -> "!" {% id %}
+
+condition -> AS _ conditional _ AS {% function(d) { return [d[2], d[0], d[4]]} %}
+            | AS {% id %}
 conditionals -> "==" | ">=" | "<=" | "!=" | ">" | "<"
 conditional -> conditionals {% function(d) { return d[0][0] } %}
 
-return -> _ "return " value {% function(d) { return ["return", d[2]] } %}
+return -> _ "return " exp {% function(d) { return ["return", d[2]] } %}
 
 BlockComment -> _ "/*" commentbody "*/" {% function(d) { return ["comment"] } %}
 LineComment -> _ "//" LineEnd {% function(d) { return ["comment"]} %}
@@ -117,7 +122,7 @@ function -> "function " word _ "(" _ params _ ")" _ "{" block _ "}"
             {% function(d) { return ["func", d[1], d[5], []] } %}
 
 param -> type " " word {% function(d) { return [d[0], d[2]] } %}
-paramval -> value {% id %}
+paramval -> exp {% id %}
 params -> null | param | params _ "," _ param {% function(d){ return d[0].concat([d[4]])} %}
 paramvals -> null | paramval | paramvals _ "," _ paramval {% function(d) { return d[0].concat([d[4]])} %}
 block -> statement | block statement {% function(d) { return d[0].concat([d[1]])} %}

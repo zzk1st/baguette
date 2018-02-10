@@ -23,5 +23,17 @@
       "name": "test-in-memory",
       "program": "${workspaceFolder}/examples/vm-hello-world-in-memory.js"
     },
+    {
+      "type": "node",
+      "request": "launch",
+      "name": "Run AVA test",
+      "program": "${workspaceRoot}/node_modules/ava/profile.js",
+      "args": [
+        "${workspaceRoot}/tests/tests.js"
+      ],
+      "skipFiles": [
+        "<node_internals>/**/*.js"
+      ]
+    }
   ]
 }
