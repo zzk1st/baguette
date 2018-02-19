@@ -8,6 +8,8 @@ let envFuncs = {
     funcImp: (text) => console.log(text),
   }
 };
+
+/*
 let envVars = {
   a: {
     a1: {
@@ -18,26 +20,56 @@ let envVars = {
   b: -1,
   c: ""
 };
-//let src = `
-//  function main()
-//  {
-//    a.a1.a11 = b;
-//    b = (1 + 2) * 4 / 3 - 5;
-//    c = a.a2;
-//
-//    return a;
-//  }
-//`;
+
 let src = `
+  function max(a, b)
+  {
+    if (a > b)
+    {
+      d = a;
+    }
+    else
+    {
+      d = b;
+    }
+
+    return d;
+  }
+
   function main()
   {
-    if (!b == 0 && a.a1.a11 == 1) 
+    if (max(max(1, 2), 3) == 3)
     {
+      game.print("yes");
       return true;
     }
+   game.print("no");
     return false;
   }
 `;
+*/
+let envVars = {
+  a: {
+    a1: {
+      a11: 1
+    },
+    a2: "str"
+  },
+  b: 0.5,
+  c: ""
+};
+
+let src=`
+  function main()
+  {
+    game.a.a1.a11 = game.b;
+    game.b = (1 + 2) * 4 / 3 - 5;
+    game.c = game.a.a2;
+
+    return game.b;
+  }
+`;
+
 let baguetteCompiler = new BaguetteCompiler(src);
 let interCode = baguetteCompiler.generateIntermediateCode();
 let baguetteVM = new BaguetteVM(interCode, envVars, envFuncs);

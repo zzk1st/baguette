@@ -2,6 +2,12 @@ var fs = require('fs');
 var nearley = require('nearley');
 var baguetteGrammar = require('./baguette-grammar');
 
+function compilerLog(level, item) {
+  if (level == 'INFO' || level == 'WARN') {
+    console.log('[' + level + "] " + item);
+  }
+}
+
 class BaguetteCompiler {
   constructor(content) {
     this.content = content;
@@ -9,6 +15,52 @@ class BaguetteCompiler {
     this.parseTree = [];
     this.curStatement = [];
     this.nextFlowTag = 0;
+    this.funcSymTable = {};
+  }
+
+  ////////////////////////////////////
+  // Public Functions
+  ////////////////////////////////////
+
+  generateIntermediateCode() {
+    this.generateParseTree();
+    this.constructSymbolTable();
+    return this.generateCode();
+  }
+
+  ////////////////////////////////////
+  // Private Functions
+  ////////////////////////////////////
+
+  constructSymbolTable() {
+    let funcDecls = this.parseTree[0];
+    for (let i = 0; i < funcDecls.length; i++) {
+      let funcDecl = funcDecls[i];
+      if (funcDecl[0] != 'func') {
+        throw new Error("not a function");
+      }
+
+      // Next construct the table
+      this.funcSymTable[funcDecl[1]] = funcDecl[2];
+    }
+
+    compilerLog('DEBUG', 'func symtable=' + this.funcSymTable);
+  }
+
+  generateCode() {
+    let funcDecls = this.parseTree[0];
+    for (let i = 0; i < funcDecls.length; i++) {
+      let funcDecl = funcDecls[i];
+      if (funcDecl[0] != 'func') {
+        throw new Error("not a function");
+      }
+
+      this.addInstruction(['function', funcDecl[1]]);
+      this.generateBlock(funcDecl[3]);
+      this.addInstruction(['function_end']);
+    }
+
+    return this.intermediateCode;
   }
 
   getNextFlowTag() {
@@ -49,37 +101,42 @@ class BaguetteCompiler {
     return varPattern.test(id);
   }
 
-  generateIntermediateCode() {
-    this.generateParseTree();
 
-    let funcDecls = this.parseTree[0];
-    for (let i = 0; i < funcDecls.length; i++) {
-      let funcDecl = funcDecls[i];
-      if (funcDecl[0] != 'func') {
-        throw new Error("not a function");
+  generateParams(funcDecl, params) {
+    if (funcDecl == undefined) {
+      // this is a env function call
+      for (let i = 0; i < params.length; i++) {
+        let param = params[i];
+        this.generateExp(param);
+      }
+    } else {
+      // This is a local function call
+      if (params.length != funcDecl.length) {
+        throw new Error(`Unmatched function call param list, line=${this.curStatement}`);
       }
 
-      this.addInstruction(['function', funcDecl[1]]);
-      this.generateBlock(funcDecl[3]);
-      this.addInstruction(['function_end']);
-    }
-
-    return this.intermediateCode;
-  }
-
-  generateParams(params) {
-    for (let i = 0; i < params.length; i++) {
-      let param = params[i];
-      this.generateExp(param);
+      for (let i = 0; i < params.length; i++) {
+        let param = params[i];
+        this.generateExp(param);
+        this.addInstruction(['pop_to_params', funcDecl[i]]);
+      }
     }
   }
 
   generateFunctionCall(statement) {
-    if (!this.isSymbol(statement[1])) {
+    let funcSymbol = statement[1];
+    if (!this.isSymbol(funcSymbol)) {
       throw new Error(`Function name is not a symbol, line=${this.curStatement}`);
     }
-    this.generateParams(statement[2]);
-    this.addInstruction(['call', statement[1]]);
+    if (!(funcSymbol in this.funcSymTable) && !(funcSymbol.startsWith('game.'))) {
+      throw new Error(`Unknown function name ${funcSymbol}, line=${this.curStatement}`);
+    }
+    
+    // if the function to call is a env function, funcDecl is empty
+    let funcDecl = this.funcSymTable[funcSymbol];
+    let params = statement[2];
+    this.generateParams(funcDecl, params);
+    this.addInstruction(['call', funcSymbol]);
   }
 
   generateAssign(statement) {
@@ -137,6 +194,8 @@ class BaguetteCompiler {
         this.generateAssign(statement);
       } else if (statement[0] == 'call') {
         this.generateFunctionCall(statement);
+        // A function call always return a value, here we should pop it from the stack since the return value is unused
+        this.addInstruction(['pop']);
       } else {
         throw new Error(`Unknown statement ${this.curStatement}`);
       }

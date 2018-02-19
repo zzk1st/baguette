@@ -118,7 +118,7 @@ function id(x) {return x[0]; }
     {"name": "function", "symbols": ["function$string$1", "word", "_", {"literal":"("}, "_", "params", "_", {"literal":")"}, "_", {"literal":"{"}, "block", "_", {"literal":"}"}], "postprocess": function(d) { return ["func", d[1], d[5], d[10]] }},
     {"name": "function$string$2", "symbols": [{"literal":"f"}, {"literal":"u"}, {"literal":"n"}, {"literal":"c"}, {"literal":"t"}, {"literal":"i"}, {"literal":"o"}, {"literal":"n"}, {"literal":" "}], "postprocess": function joiner(d) {return d.join('');}},
     {"name": "function", "symbols": ["function$string$2", "word", "_", {"literal":"("}, "_", "params", "_", {"literal":")"}, "_", {"literal":"{"}, "_", {"literal":"}"}], "postprocess": function(d) { return ["func", d[1], d[5], []] }},
-    {"name": "param", "symbols": ["type", {"literal":" "}, "word"], "postprocess": function(d) { return [d[0], d[2]] }},
+    {"name": "param", "symbols": ["word"], "postprocess": function(d) { return d[0] }},
     {"name": "paramval", "symbols": ["exp"], "postprocess": id},
     {"name": "params", "symbols": []},
     {"name": "params", "symbols": ["param"]},

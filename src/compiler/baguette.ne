@@ -121,7 +121,7 @@ function -> "function " word _ "(" _ params _ ")" _ "{" block _ "}"
           | "function " word _ "(" _ params _ ")" _ "{" _ "}"
             {% function(d) { return ["func", d[1], d[5], []] } %}
 
-param -> type " " word {% function(d) { return [d[0], d[2]] } %}
+param -> word {% function(d) { return d[0] } %}
 paramval -> exp {% id %}
 params -> null | param | params _ "," _ param {% function(d){ return d[0].concat([d[4]])} %}
 paramvals -> null | paramval | paramvals _ "," _ paramval {% function(d) { return d[0].concat([d[4]])} %}
