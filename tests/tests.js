@@ -86,21 +86,29 @@ ava.test('ASSIGNMENT TEST', t => {
 // Like if-else in any other language
 //----------------------------------------------------------------------------
 ava.test('IF ELSE TEST', t => {
-  let envVars = {};
-  let result = runScript(envVars, `
+  let src = `
     function main()
     {
-      a = 1;
-      if (a == 1) {
-        result = true;
+      if (game.foo == 1) {
+        result = "a";
+      } else if (game.foo==2) {
+        result = "b";
+      } else if (game.foo==3) {
+        result = "c";
       } else {
-        result = false;
+        result = "d";
       }
       return result;
     }
-  `);
+  `;
 
-  t.deepEqual(result, true);
+  let envVars = {foo:3};
+  let result = runScript(envVars, src);
+  t.deepEqual(result, 'c');
+
+  envVars = {foo:4};
+  result = runScript(envVars, src);
+  t.deepEqual(result, 'd');
 });
 
 //----------------------------------------------------------------------------

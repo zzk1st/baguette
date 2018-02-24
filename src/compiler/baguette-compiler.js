@@ -188,30 +188,37 @@ class BaguetteCompiler {
     this.addInstruction(["tag", ifEndTag]);
   }
 
-  generateBlock(statements) {
-    for (let i = 0; i < statements.length; i++) {
-      this.curStatement = statements[i];
-      let statement = statements[i];
+  generateStatement(statement) {
+    this.curStatement = statement;
 
-      if (Array.isArray(statement[0])) {
-        // For some reason (bug?), nearley SOMETIMES added a nested array for "if" statement
-        // workaround for now
-        this.generateBlock(statement);
-      } else if (statement[0] == 'ifElse') {
-        this.generateIfElse(statement);
-      } else if (statement[0] == 'if') {
-        this.generateIf(statement);
-      } else if (statement[0] == 'return') {
-        this.generateExp(statement[1]);
-        this.addInstruction(['return']);
-      } else if (statement[0] == 'assignment') {
-        this.generateAssign(statement);
-      } else if (statement[0] == 'call') {
-        this.generateFunctionCall(statement);
-        // A function call always return a value, here we should pop it from the stack since the return value is unused
-        this.addInstruction(['pop']);
-      } else {
-        throw new Error(`Unknown statement ${this.curStatement}`);
+    if (Array.isArray(statement[0])) {
+      // For some reason (bug?), nearley SOMETIMES added a nested array for "if" statement
+      // workaround for now
+      this.generateBlock(statement);
+    } else if (statement[0] == 'ifElse') {
+      this.generateIfElse(statement);
+    } else if (statement[0] == 'if') {
+      this.generateIf(statement);
+    } else if (statement[0] == 'return') {
+      this.generateExp(statement[1]);
+      this.addInstruction(['return']);
+    } else if (statement[0] == 'assignment') {
+      this.generateAssign(statement);
+    } else if (statement[0] == 'call') {
+      this.generateFunctionCall(statement);
+      // A function call always return a value, here we should pop it from the stack since the return value is unused
+      this.addInstruction(['pop']);
+    } else {
+      throw new Error(`Unknown statement ${this.curStatement}`);
+    }
+  }
+
+  generateBlock(statements) {
+    if (typeof statements[0] == 'string') { // if it is a string, then it is a single statement
+      this.generateStatement(statements);
+    } else {
+      for (let i = 0; i < statements.length; i++) {
+        this.generateStatement(statements[i]);
       }
     }
   }

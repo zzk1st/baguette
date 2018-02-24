@@ -62,11 +62,17 @@ let envVars = {
 let src=`
   function main()
   {
-    game.a.a1.a11 = game.b;
-    game.b = (1 + 2) * 4 / 3 - 5;
-    game.c = game.a.a2;
-
-    return game.b;
+    a = 4;
+    if (a == 1) {
+      game.print("1");
+    } else if (a == 2) {
+      game.print("2");
+    } else if (a == 3) {
+      game.print("3");
+    } else {
+      game.print("4");
+      game.print("5");
+    }
   }
 `;
 
