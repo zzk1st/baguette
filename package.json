@@ -1,6 +1,6 @@
 {
   "name": "baguette",
-  "version": "0.1.7",
+  "version": "0.1.8",
   "description": "an extremely light-weighted scripting language designed for javascript",
   "main": "src/vm/baguette-vm.js",
   "scripts": {
