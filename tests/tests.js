@@ -52,6 +52,35 @@ ava.test('EXPRESSION TEST', t => {
 });
 
 //----------------------------------------------------------------------------
+// ASSIGNMENT TEST
+//----------------------------------------------------------------------------
+// Assignments support '=', '+=', '-=', '*=', '/='. Pay attention that currently
+// ++ and -- are not supported.
+//----------------------------------------------------------------------------
+ava.test('ASSIGNMENT TEST', t => {
+  let envVars = {a: {a1:0}};
+  let result = runScript(envVars, `
+    function main()
+    {
+      a=0;
+      a+=2;
+      a-=1;
+      a*=2;
+      a/=2;
+
+      game.a.a1=0;
+      game.a.a1+=2;
+      game.a.a1-=1;
+      game.a.a1*=2;
+      game.a.a1/=2;
+
+      return a+game.a.a1;
+    }
+  `);
+
+  t.deepEqual(result, 2);
+});
+//----------------------------------------------------------------------------
 // IF ELSE TEST
 //----------------------------------------------------------------------------
 // Like if-else in any other language
@@ -142,15 +171,15 @@ ava.test('FUNCTION TEST', t => {
 });
 
 //----------------------------------------------------------------------------
-// ENV VARIABLE TEST
+// ENV VARIABLE TEST I
 //----------------------------------------------------------------------------
-// Environment variables are defined by the host, and can be used in the code 
-// in the form of 'game.[env_name]'.
+// Environment variables are defined by the host or in the script (see ENV 
+// VARIABLE TEST II), and can be used in the code in the form of 'game.[env_name]'.
 //
 // You can also define complex javascript object in environment variables. And
 // they can be accessed in the form of foo.bar.xxx (see the tranche below)
 //----------------------------------------------------------------------------
-ava.test('ENV VARIABLE TEST', t => {
+ava.test('ENV VARIABLE TEST I', t => {
   let envVars = {
     a: {
       a1: {
@@ -179,6 +208,38 @@ ava.test('ENV VARIABLE TEST', t => {
   t.deepEqual(envVars.c, "str");
 });
 
+//----------------------------------------------------------------------------
+// ENV VARIABLE TEST II
+//----------------------------------------------------------------------------
+// Environment variables defined in the script can only be primitive types.
+// Users are able to check their existence via if (game.[varname] == undefined)
+//
+// Since these env vars' lifetime is beyond a single function, they are very
+// useful as persistant internal game stats, without touching host's code.
+//----------------------------------------------------------------------------
+ava.test('ENV VARIABLE TEST II', t => {
+  let envVars = {};
+  let src = `
+    function main()
+    {
+      if (game.foo == undefined)
+      {
+        game.foo = 0;
+      }
+
+      game.foo = game.foo + 1;
+
+      return game.foo;
+    }
+  `;
+
+  let result = runScript(envVars, src);
+  t.deepEqual(result, 1);
+  result = runScript(envVars, src);
+  t.deepEqual(result, 2);
+  result = runScript(envVars, src);
+  t.deepEqual(result, 3);
+});
 //----------------------------------------------------------------------------
 // PAUSE & CONTINUE TEST
 //----------------------------------------------------------------------------

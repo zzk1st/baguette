@@ -83,6 +83,10 @@ class BaguetteCompiler {
     this.intermediateCode += instruction;
   }
 
+  isUndefined(n) {
+    return n == 'undefined';
+  }
+
   isBool(n) {
     return n == "true" || n == "false";
   }
@@ -145,7 +149,17 @@ class BaguetteCompiler {
       throw new Error(`${this.curStatement[1]} is not a variable!`);
     }
 
-    this.addInstruction(['assign', statement[1]]);
+    if (statement[2] == '+=') {
+      this.addInstruction(['assign_plus', statement[1]]);
+    } else if (statement[2] == '-=') {
+      this.addInstruction(['assign_minus', statement[1]]);
+    } else if (statement[2] == '*=') {
+      this.addInstruction(['assign_multiply', statement[1]]);
+    } else if (statement[2] == '/=') {
+      this.addInstruction(['assign_divide', statement[1]]);
+    } else {
+      this.addInstruction(['assign', statement[1]]);
+    }
   }
 
   generateIfWithoutIfEndTag(statement) {
@@ -205,6 +219,8 @@ class BaguetteCompiler {
   generateExp(exp) {
     if (exp[0] == 'call') {
       this.generateFunctionCall(exp);
+    } else if (this.isUndefined(exp)) {
+      this.addInstruction(['pushundef']);
     } else if (this.isBool(exp)) {
       this.addInstruction(['pushbool', exp]);
     } else if (this.isNumeric(exp)) {

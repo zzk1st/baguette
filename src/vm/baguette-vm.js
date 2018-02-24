@@ -231,16 +231,37 @@ class BaguetteVM {
       // this is an environment variable
       let fields = instruction[1].split('.');
       result = this.envVars;
-      for (let i = 1; i < fields.length; ++i) {
-        if (!(fields[i] in result)) {
-          throw new Error(`${varName} is not in environment variables!`);
+      if (fields.length == 2) {
+        // we might push undefined to stack, this is used to test
+        // if an env-var exists
+        result = result[fields[1]];
+      } else {
+        for (let i = 1; i < fields.length; ++i) {
+          if (!(fields[i] in result)) {
+            throw new Error(`${varName} is not in environment variables!`);
+          }
+          result = result[fields[i]];
         }
-
-        result = result[fields[i]];
       }
     }
 
     this._stack.push(result);
+  }
+
+  assignWithOp(op, varToAssign, value) {
+    if (op == 'assign') {
+      return value;
+    } else if (op == 'assign_plus') {
+      return varToAssign + value;
+    } else if (op == 'assign_minus') {
+      return varToAssign - value;
+    } else if (op == 'assign_multiply') {
+      return varToAssign * value;
+    } else if (op == 'assign_divide') {
+      return varToAssign / value;
+    } else {
+      throw new Error('unknown assign op!');
+    }
   }
 
   runAssign(instruction) {
@@ -249,17 +270,19 @@ class BaguetteVM {
 
     let fields = varName.split('.');
     if (fields.length == 1) {
-      localVars[varName] = this.stackSafePop();
+      localVars[varName] = this.assignWithOp(instruction[0], localVars[varName], this.stackSafePop());
     } else {
       if (!varName.startsWith(EnvVarFuncPrefix)) {
           throw new Error(`Unknown environment varialble ${varName}!`);
       }
 
       if (fields.length == 2) {
+        // If fields length is 2, it means this is a primitive type,
+        // We will create the env variable if it does not exist
         if (!(fields[1] in this.envVars)) {
-          throw new Error(`${varName} is not in environment variables!`);
+          // do nothing here
         }
-        this.envVars[fields[1]] = this.stackSafePop();
+        this.envVars[fields[1]] = this.assignWithOp(instruction[0], this.envVars[fields[1]], this.stackSafePop());
       } else {
         var envVarToAssign = this.envVars[fields[1]];
         for (let i = 2; i < fields.length - 1; ++i) {
@@ -272,7 +295,7 @@ class BaguetteVM {
         if (!(finalField in envVarToAssign)) {
           throw new Error(`${finalField} is not in environment variables!`);
         }
-        envVarToAssign[finalField] = this.stackSafePop();
+        envVarToAssign[finalField] = this.assignWithOp(instruction[0], envVarToAssign[finalField], this.stackSafePop());
       }
     }
   }
@@ -302,6 +325,8 @@ class BaguetteVM {
     //--------------------------------------
     // push & pop instructions
     //--------------------------------------
+    } else if (instruction[0] == 'pushundef') {
+      this._stack.push(undefined);
     } else if (instruction[0] == 'pushbool') {
       this._stack.push(instruction[1] == 'true');
     } else if (instruction[0] == 'pushnum') {
@@ -377,7 +402,7 @@ class BaguetteVM {
     //--------------------------------------
     // assign instructions
     //--------------------------------------
-    } else if (instruction[0] == 'assign') {
+    } else if (instruction[0].startsWith('assign')) {
       this.runAssign(instruction);
     } else {
       throw new Error(`Unknown instruction: ${instruction}`);
