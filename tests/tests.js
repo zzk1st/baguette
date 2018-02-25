@@ -280,3 +280,24 @@ ava.test('PAUSE & CONTINUE TEST', t => {
 
   t.deepEqual(finalResult, 3);
 });
+
+//----------------------------------------------------------------------------
+// BUILT-IN FUNCTION TEST
+//----------------------------------------------------------------------------
+// Built-in functions are provided by the system and can be called directly in
+// the script.
+// Currently provided built-in functions are: abs, floor.
+//----------------------------------------------------------------------------
+ava.test('BUILT-IN FUNCTION TEST', t => {
+  let envVars = {};
+  let src = `
+    function main()
+    {
+      a = -1.05;
+      return floor(abs(a));
+    }
+  `;
+
+  let result = runScript(envVars, src);
+  t.deepEqual(result, 1);
+});

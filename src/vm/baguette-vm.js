@@ -189,6 +189,22 @@ class BaguetteVM {
     }
   }
 
+  runBuiltInFuncCall(instruction) {
+    let funcName = instruction[1];
+    let complete = false;
+    if (funcName == 'floor') {
+      let value = this.stackSafePop();
+      this._stack.push(Math.floor(value));
+      complete = true;
+    } else if (funcName == 'abs') {
+      let value = this.stackSafePop();
+      this._stack.push(Math.abs(value));
+      complete = true;
+    }
+
+    return complete;
+  }
+
   runFuncCall(instruction) {
     let funcName = instruction[1];
 
@@ -197,6 +213,12 @@ class BaguetteVM {
       return this.runEnvFuncCall(instruction);
     }
 
+    // Second try run this function call as a built-in function
+    if (this.runBuiltInFuncCall(instruction)) {
+      return;
+    }
+
+    // Lastly, run it as a user-defined function call
     if (!(funcName in this.funcEntries)) {
       throw new Error(`Cannot find function entry: ${funcName}!`);
     }

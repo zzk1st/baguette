@@ -60,20 +60,11 @@ let envVars = {
 };
 
 let src=`
-  function main()
-  {
-    a = 4;
-    if (a == 1) {
-      game.print("1");
-    } else if (a == 2) {
-      game.print("2");
-    } else if (a == 3) {
-      game.print("3");
-    } else {
-      game.print("4");
-      game.print("5");
+    function main()
+    {
+      a = -1.05;
+      return abs(a);
     }
-  }
 `;
 
 let baguetteCompiler = new BaguetteCompiler(src);

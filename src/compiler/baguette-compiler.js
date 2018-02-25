@@ -16,6 +16,7 @@ class BaguetteCompiler {
     this.curStatement = [];
     this.nextFlowTag = 0;
     this.funcSymTable = {};
+    this.builtInFuncSymTable = {};
   }
 
   ////////////////////////////////////
@@ -31,7 +32,6 @@ class BaguetteCompiler {
   ////////////////////////////////////
   // Private Functions
   ////////////////////////////////////
-
   constructSymbolTable() {
     let funcDecls = this.parseTree[0];
     for (let i = 0; i < funcDecls.length; i++) {
@@ -44,7 +44,17 @@ class BaguetteCompiler {
       this.funcSymTable[funcDecl[1]] = funcDecl[2];
     }
 
+    // constructBuiltInFuncSymTable() runs after normal functions, this will guarantee
+    // that the built-in functions will not be covered by user-defined functions
+    this.constructBuiltInFuncSymTable();
+
     compilerLog('DEBUG', 'func symtable=' + this.funcSymTable);
+    compilerLog('DEBUG', 'built-in func symtable=' + this.builtInFuncSymTable);
+  }
+
+  constructBuiltInFuncSymTable() {
+    this.builtInFuncSymTable['floor'] = ['value'];
+    this.builtInFuncSymTable['abs'] = ['value'];
   }
 
   generateCode() {
@@ -132,11 +142,15 @@ class BaguetteCompiler {
     if (!this.isSymbol(funcSymbol)) {
       throw new Error(`Function name is not a symbol, line=${this.curStatement}`);
     }
-    if (!(funcSymbol in this.funcSymTable) && !(funcSymbol.startsWith('game.'))) {
+    if (!(funcSymbol in this.funcSymTable) && 
+        !(funcSymbol in this.builtInFuncSymTable) && 
+        !(funcSymbol.startsWith('game.'))) {
       throw new Error(`Unknown function name ${funcSymbol}, line=${this.curStatement}`);
     }
     
-    // if the function to call is a env function, funcDecl is empty
+    // if the function to call is a env function or a built-in function, funcDecl is empty
+    // In this case, generateParams() will push vars to stack directly instead of putting
+    // the params into params of current frame
     let funcDecl = this.funcSymTable[funcSymbol];
     let params = statement[2];
     this.generateParams(funcDecl, params);
